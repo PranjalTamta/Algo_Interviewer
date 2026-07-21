@@ -80,30 +80,37 @@ const MarkdownContent = ({ content }) => (
     rehypePlugins={[rehypeHighlight]}
     components={{
       pre: ({ children }) => (
-        <pre className="overflow-x-auto rounded-2xl border border-white/10 bg-[#0b1020] p-4 text-sm leading-6 text-white shadow-inner shadow-black/20">
+        <pre className="min-w-0 overflow-x-auto rounded-2xl border border-white/10 bg-[#0b1020] p-4 text-sm leading-6 text-white shadow-inner shadow-black/20">
           {children}
         </pre>
       ),
-      code: ({ inline, className, children, ...props }) =>
-        inline ? (
-          <code
-            className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.9em] text-green-200"
-            {...props}
-          >
-            {children}
-          </code>
-        ) : (
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1020] shadow-inner shadow-black/20">
+      code: ({ className, children, ...props }) => {
+        const isInline = !className;
+
+        if (isInline) {
+          return (
+            <code
+              className="break-words rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.9em] text-green-200"
+              {...props}
+            >
+              {children}
+            </code>
+          );
+        }
+
+        return (
+          <div className="min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-[#0b1020] shadow-inner shadow-black/20">
             <div className="flex items-center justify-between border-b border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/55">
               <span>{getLanguageLabel(className)}</span>
             </div>
-            <pre className="overflow-x-auto p-4 text-sm leading-6 text-white">
+            <pre className="min-w-0 overflow-x-auto p-4 text-sm leading-6 text-white">
               <code className={className} {...props}>
                 {children}
               </code>
             </pre>
           </div>
-        ),
+        );
+      },
     }}
   >
     {content}
@@ -274,7 +281,7 @@ export default function Chat() {
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,197,94,0.18),_transparent_34%),linear-gradient(180deg,_#050816_0%,_#02040a_100%)] px-4 py-6 text-white sm:px-6 lg:px-8">
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-black/40 backdrop-blur-xl">
+      <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl min-w-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-black/40 backdrop-blur-xl">
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
           <div>
             <p className="text-sm uppercase tracking-[0.35em] text-green-400/80">
@@ -290,8 +297,8 @@ export default function Chat() {
           </div>
         </div>
 
-        <div className="grid flex-1 gap-4 p-4 md:grid-cols-[1.15fr_1.85fr] md:p-6">
-          <section className="flex flex-col gap-4">
+        <div className="grid flex-1 min-w-0 gap-4 p-4 md:grid-cols-[1.15fr_1.85fr] md:p-6">
+          <section className="flex min-w-0 flex-col gap-4">
             <div className="rounded-2xl border border-white/10 bg-black/30 p-4 shadow-lg shadow-black/20">
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-semibold uppercase tracking-[0.3em] text-green-300/90">
@@ -302,7 +309,7 @@ export default function Chat() {
                 )}
               </div>
 
-              <div className="min-h-40 rounded-2xl border border-green-400/15 bg-white/5 p-4 text-sm leading-7 text-white/90">
+              <div className="min-h-40 min-w-0 rounded-2xl border border-green-400/15 bg-white/5 p-4 text-sm leading-7 text-white/90">
                 {question ? (
                   <MarkdownContent content={question} />
                 ) : (
@@ -341,14 +348,14 @@ export default function Chat() {
             </div>
           </section>
 
-          <section className="flex min-h-0 flex-col rounded-2xl border border-white/10 bg-black/25 shadow-lg shadow-black/20">
+          <section className="flex min-h-0 min-w-0 flex-col rounded-2xl border border-white/10 bg-black/25 shadow-lg shadow-black/20">
             <div className="border-b border-white/10 px-4 py-3 sm:px-5">
               <h2 className="text-sm font-semibold uppercase tracking-[0.3em] text-green-300/90">
                 Conversation Box
               </h2>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
+            <div className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
               {messages.length === 0 ? (
                 <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/5 px-6 py-12 text-center text-sm text-white/45">
                   Your answer and interview feedback will appear here.
@@ -358,7 +365,7 @@ export default function Chat() {
                   {messages.map((m, i) => (
                     <div
                       key={i}
-                      className={`max-w-[92%] rounded-2xl border px-4 py-3 text-sm leading-6 sm:max-w-[85%] ${
+                      className={`max-w-[92%] min-w-0 rounded-2xl border px-4 py-3 text-sm leading-6 sm:max-w-[85%] ${
                         m.role === "user"
                           ? "ml-auto border-green-400/25 bg-green-500/15 text-green-50"
                           : "border-white/10 bg-white/8 text-white/90"
@@ -368,7 +375,9 @@ export default function Chat() {
                         {m.role === "user" ? "You" : "AI"}
                       </p>
                       {m.role === "user" ? (
-                        <p className="whitespace-pre-line">{m.content}</p>
+                        <p className="whitespace-pre-line break-words">
+                          {m.content}
+                        </p>
                       ) : (
                         <MarkdownContent content={m.content} />
                       )}
@@ -379,13 +388,13 @@ export default function Chat() {
             </div>
 
             <div className="border-t border-white/10 p-4 sm:p-5">
-              <div className="mx-auto flex w-full max-w-4xl flex-col gap-3 sm:flex-row sm:items-start">
+              <div className="mx-auto flex w-full max-w-4xl min-w-0 flex-col gap-3 sm:flex-row sm:items-start">
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Paste code or type your answer here..."
                   rows={4}
-                  className="min-h-28 w-full flex-1 resize-y rounded-2xl border border-white/10 bg-white/10 px-4 py-2.5 text-sm text-white outline-none placeholder:text-white/35 focus:border-green-400/50"
+                  className="min-h-28 w-full min-w-0 flex-1 resize-y rounded-2xl border border-white/10 bg-white/10 px-4 py-2.5 text-sm text-white outline-none placeholder:text-white/35 focus:border-green-400/50"
                 />
 
                 <button
